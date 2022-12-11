@@ -178,14 +178,18 @@ class CharCorruptionDataset(Dataset):
 
         ### START CODE HERE
         document = self.data[idx]
+        document = document[:self.block_size - 3]  # truncate document to block size, including mask_chars
         rand_len = random.randrange(4, int(self.block_size*7/8))
-        rand_start = random.randrange(0, len(document) - rand_len)
+        rand_start = random.randrange(1, int(self.block_size*7/8))
         prefix = document[:rand_start]
         masked_content = document[rand_start:rand_start + rand_len]
         suffix = document[rand_start + rand_len:]
-        pads = self.PAD_CHAR * (self.block_size - len(document))
-        masked_string = prefix + self.MASK_CHAR + suffix + self.MASK_CHAR + masked_content + self.MASK_CHAR + pads
-        print(masked_string)
+        assert document == prefix + masked_content + suffix
+        masked_string = prefix + self.MASK_CHAR + suffix + self.MASK_CHAR + masked_content + self.MASK_CHAR
+        padding = self.PAD_CHAR * (self.block_size - len(masked_string))
+        masked_string += padding
+        assert len(masked_string) == self.block_size, \
+            f'masked string len: {len(masked_string)}, block size: {self.block_size}'
         input = masked_string[:-1]
         output = masked_string[1:]
         input_ix = [self.stoi[s] for s in input]
