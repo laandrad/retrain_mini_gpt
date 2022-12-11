@@ -44,7 +44,10 @@ def evaluate(args, pretrain_dataset, device, model):
     assert args['--outputs_path'] is not None
     assert args['--reading_params_path'] is not None
     assert args['--eval_corpus_path'] is not None
-    model.load_state_dict(torch.load(args['--reading_params_path']))
+    state_dict = torch.load(args['--reading_params_path'])
+    remove_prefix = 'module.'
+    state_dict = {k[len(remove_prefix):] if k.startswith(remove_prefix) else k: v for k, v in state_dict.items()}
+    model.load_state_dict(state_dict)
     correct = 0
     total = 0
     with open(args['--outputs_path'], 'w', encoding='utf-8') as fout:
