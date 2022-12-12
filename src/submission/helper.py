@@ -64,7 +64,6 @@ def finetune(reading_params_path, finetune_corpus_path, pretrain_dataset, block_
     trainer_obj = None #Trainer object (see trainer.py for more details)
     tconf = None #TrainerConfig object (see trainer.py for more details)
     ### START CODE HERE
-    print(reading_params_path)
     tconf = TrainerConfig()
     tconf.batch_size = 256
     tconf.learning_rate = 6e-4
@@ -79,7 +78,7 @@ def finetune(reading_params_path, finetune_corpus_path, pretrain_dataset, block_
         state_dict = torch.load(reading_params_path)
         remove_prefix = 'module.'
         state_dict = {k[len(remove_prefix):] if k.startswith(remove_prefix) else k: v for k, v in state_dict.items()}
-        model.load_state_dict(torch.load(state_dict))
+        model.load_state_dict(state_dict)
 
     finetuning_corpus = open(finetune_corpus_path, 'r').read()
     finetuning_data = NameDataset(finetuning_corpus, pretrain_dataset)
